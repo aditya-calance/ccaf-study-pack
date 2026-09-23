@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CCAR-F Study Pack</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/DOMPurify/3.0.6/purify.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap">
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            --bg: #fafaf9;
+            --bg-alt: #f5f5f4;
+            --fg: #1c1917;
+            --fg-muted: #78716b;
+            --border: #e7e5e4;
+            --accent: #0891b2;
+            --accent-light: #06b6d4;
+            --code-bg: #f5f5f4;
+            --code-fg: #7c2d12;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #1c1917;
+                --bg-alt: #292524;
+                --fg: #fafaf9;
+                --fg-muted: #a8a29e;
+                --border: #44403c;
+                --code-bg: #292524;
+                --code-fg: #fca5a5;
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #1c1917;
+            --bg-alt: #292524;
+            --fg: #fafaf9;
+            --fg-muted: #a8a29e;
+            --border: #44403c;
+            --code-bg: #292524;
+            --code-fg: #fca5a5;
+            color-scheme: dark;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            margin: 0;
+            padding: 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .sidebar {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: var(--bg);
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 1rem;
+            }
+            .sidebar.collapsed .nav-list {
+                display: none;
+            }
+            .toggle-nav {
+                display: block;
+            }
+        }
+
+        .sidebar {
+            background: var(--bg-alt);
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 1rem;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--fg);
+        }
+
+        .toggle-nav {
+            display: none;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            font-size: 0.85rem;
+        }
+
+        .nav-list li {
+            margin: 0.25rem 0;
+        }
+
+        .nav-list a {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--fg-muted);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.2s;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-list a:hover {
+            background: var(--border);
+            color: var(--accent);
+        }
+
+        .nav-list a.active {
+            background: var(--accent);
+            color: white;
+            border-left-color: var(--accent-light);
+        }
+
+        .content {
+            min-height: 100vh;
+        }
+
+        .content h1 {
+            font-size: 2rem;
+            margin: 0 0 1.5rem 0;
+            font-weight: 700;
+            color: var(--fg);
+            line-height: 1.2;
+        }
+
+        .content h2 {
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem 0;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+
+        .content h3 {
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.75rem 0;
+            font-weight: 600;
+        }
+
+        .content p, .content li {
+            margin: 1rem 0;
+        }
+
+        .content a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .content a:hover {
+            border-bottom-color: var(--accent);
+        }
+
+        .content code {
+            background: var(--code-bg);
+            color: var(--code-fg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .content pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .content pre code {
+            background: none;
+            color: var(--code-fg);
+            padding: 0;
+            border-radius: 0;
+            font-size: 0.85rem;
+        }
+
+        .content blockquote {
+            border-left: 4px solid var(--accent);
+            margin: 1rem 0;
+            padding: 0 0 0 1rem;
+            color: var(--fg-muted);
+            font-style: italic;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .content table th,
+        .content table td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .content table th {
+            background: var(--bg-alt);
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--fg-muted);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .breadcrumb a {
+            color: var(--accent);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--fg-muted);
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .error {
+                background: #7f1d1d;
+                color: #fecaca;
+            }
+        }
+
+        .toc {
+            background: var(--bg-alt);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .toc a {
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .toc > ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .section-group {
+            margin-bottom: 2rem;
+        }
+
+        .section-group-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--fg-muted);
+            margin: 1.5rem 0 0.75rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <button class="toggle-nav">☰ Contents</button>
+            <h2>📚 Study Pack</h2>
+            <nav>
+                <ul class="nav-list" id="navList"></ul>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <div id="breadcrumb" class="breadcrumb"></div>
+            <div id="content" class="loading">Loading...</div>
+        </main>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/ccaf-study-pack/main';
+
+        // File structure
+        const files = [
+            { section: 'Start', name: 'START HERE', path: '00_START_HERE.md' },
+            {
+                section: 'Foundations',
+                files: [
+                    { name: 'Exam Intel & Trends', path: '01_foundations/01_exam_intel_and_trend_analysis.md' },
+                    { name: 'Answer Heuristics', path: '01_foundations/02_answer_heuristics_and_mental_models.md' },
+                ]
+            },
+            {
+                section: 'Domain Modules',
+                files: [
+                    { name: 'D1a: Agentic Loops', path: '02_domain_modules/03_D1a_agentic_loops_and_multi_agent_orchestration.md' },
+                    { name: 'D1b: Hooks & Decomposition', path: '02_domain_modules/04_D1b_enforcement_hooks_decomposition_sessions.md' },
+                    { name: 'D2a: Tool Design', path: '02_domain_modules/05_D2a_tool_design_errors_and_tool_distribution.md' },
+                    { name: 'D2b: MCP Integration', path: '02_domain_modules/06_D2b_mcp_integration_and_builtin_tools.md' },
+                    { name: 'D3a: CLAUDE.md & Rules', path: '02_domain_modules/07_D3a_claude_md_rules_skills_commands.md' },
+                    { name: 'D3b: Plan Mode & CI/CD', path: '02_domain_modules/08_D3b_plan_mode_iterative_refinement_and_cicd.md' },
+                    { name: 'D4a: Few-shot & Structured', path: '02_domain_modules/09_D4a_prompting_fewshot_and_structured_output.md' },
+                    { name: 'D4b: Validation & Retry', path: '02_domain_modules/10_D4b_validation_retry_batch_and_multipass_review.md' },
+                    { name: 'D5a: Context & Escalation', path: '02_domain_modules/11_D5a_context_management_and_escalation.md' },
+                    { name: 'D5b: Error Handling', path: '02_domain_modules/12_D5b_error_propagation_human_review_and_provenance.md' },
+                ]
+            },
+            {
+                section: 'Practice',
+                files: [
+                    { name: 'D1 Practice', path: '04_practice/16_practice_D1_agentic_architecture.md' },
+                    { name: 'D2 Practice', path: '04_practice/17_practice_D2_tools_and_mcp.md' },
+                    { name: 'D3 Practice', path: '04_practice/18_practice_D3_claude_code.md' },
+                    { name: 'D4 Practice', path: '04_practice/19_practice_D4_prompting_structured_output.md' },
+                    { name: 'D5 Practice', path: '04_practice/20_practice_D5_context_and_reliability.md' },
+                    { name: 'Mock Exam (60q)', path: '04_practice/21_full_mock_exam_60q.md' },
+                    { name: 'Mock Answers', path: '04_practice/22_mock_exam_answers_and_analysis.md' },
+                ]
+            },
+            {
+                section: 'Reference',
+                files: [
+                    { name: 'Sample Questions', path: '04_practice/15_official_sample_questions_annotated.md' },
+                    { name: 'Cheat Sheet', path: '05_reference/23_cheat_sheet_last_hour.md' },
+                    { name: 'Hands-on Labs', path: '05_reference/24_hands_on_labs_and_resources.md' },
+                ]
+            },
+            {
+                section: 'Updates',
+                files: [
+                    { name: "What's New 2026", path: '03_scenarios_and_updates/14_whats_new_2026_api_models_claude_code_cowork.md' },
+                    { name: 'Scenario Playbooks', path: '03_scenarios_and_updates/13_scenario_playbooks.md' },
+                ]
+            },
+        ];
+
+        let currentFile = null;
+        const toggleBtn = document.querySelector('.toggle-nav');
+        const navList = document.querySelector('.nav-list');
+
+        // Build navigation
+        function buildNav() {
+            navList.innerHTML = '';
+            files.forEach(item => {
+                if (item.section === 'Start') {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = '#' + encodeURIComponent(item.path);
+                    a.textContent = '🎯 ' + item.name;
+                    a.onclick = (e) => {
+                        e.preventDefault();
+                        loadFile(item.path, item.name);
+                    };
+                    li.appendChild(a);
+                    navList.appendChild(li);
+                } else {
+                    const title = document.createElement('div');
+                    title.className = 'section-group-title';
+                    title.textContent = item.section;
+                    navList.appendChild(title);
+
+                    item.files.forEach(file => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = '#' + encodeURIComponent(file.path);
+                        a.textContent = file.name;
+                        a.onclick = (e) => {
+                            e.preventDefault();
+                            loadFile(file.path, file.name);
+                            if (window.innerWidth < 768) {
+                                navList.style.display = 'none';
+                            }
+                        };
+                        li.appendChild(a);
+                        navList.appendChild(li);
+                    });
+                }
+            });
+        }
+
+        // Load and render markdown
+        async function loadFile(path, title) {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Loading...</div>';
+            currentFile = { path, title };
+
+            try {
+                const response = await fetch(`${BASE_URL}/${path}`);
+                if (!response.ok) throw new Error('File not found');
+
+                const markdown = await response.text();
+                const html = marked.parse(markdown);
+                const clean = DOMPurify.sanitize(html);
+
+                content.innerHTML = clean;
+
+                // Update breadcrumb
+                const breadcrumb = document.getElementById('breadcrumb');
+                breadcrumb.innerHTML = `<a href="#">Home</a> / <span>${title}</span>`;
+
+                // Update active nav
+                document.querySelectorAll('.nav-list a').forEach(a => {
+                    a.classList.remove('active');
+                });
+                event.target.classList.add('active');
+
+                window.scrollTo(0, 0);
+            } catch (err) {
+                content.innerHTML = `<div class="error">❌ Could not load file. Make sure the repository URL is correct and the file exists.</div>`;
+            }
+        }
+
+        // Toggle nav on mobile
+        toggleBtn.onclick = () => {
+            navList.style.display = navList.style.display === 'none' ? 'block' : 'none';
+        };
+
+        // Initialize
+        buildNav();
+
+        // Load first file if hash matches, else load START HERE
+        const hash = window.location.hash.slice(1);
+        if (hash) {
+            const file = findFileByPath(decodeURIComponent(hash));
+            if (file) loadFile(file.path, file.name);
+        } else {
+            loadFile('00_START_HERE.md', '🎯 START HERE');
+        }
+
+        function findFileByPath(path) {
+            for (const item of files) {
+                if (item.path === path) return item;
+                if (item.files) {
+                    for (const file of item.files) {
+                        if (file.path === path) return file;
+                    }
+                }
+            }
+            return null;
+        }
+    </script>
+</body>
+</html>
