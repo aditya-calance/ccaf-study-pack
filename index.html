@@ -6,6 +6,7 @@
     <title>CCAR-F Study Pack</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/DOMPurify/3.0.6/purify.min.js"></script>
+    <script src="./markdown-data.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap">
     <style>
         * { box-sizing: border-box; }
@@ -319,8 +320,6 @@
     </div>
 
     <script>
-        const BASE_URL = 'https://cdn.jsdelivr.net/gh/aditya-calance/ccaf-study-pack@main';
-
         // File structure
         const files = [
             { section: 'Start', name: 'START HERE', path: '00_START_HERE.md' },
@@ -420,16 +419,14 @@
         }
 
         // Load and render markdown
-        async function loadFile(path, title) {
+        function loadFile(path, title) {
             const content = document.getElementById('content');
-            content.innerHTML = '<div class="loading">Loading...</div>';
             currentFile = { path, title };
 
             try {
-                const response = await fetch(`${BASE_URL}/${path}`);
-                if (!response.ok) throw new Error('File not found');
+                const markdown = MARKDOWN_DATA[path];
+                if (!markdown) throw new Error('File not found in embedded data');
 
-                const markdown = await response.text();
                 const html = marked.parse(markdown);
                 const clean = DOMPurify.sanitize(html);
 
@@ -443,11 +440,11 @@
                 document.querySelectorAll('.nav-list a').forEach(a => {
                     a.classList.remove('active');
                 });
-                event.target.classList.add('active');
+                if (event && event.target) event.target.classList.add('active');
 
                 window.scrollTo(0, 0);
             } catch (err) {
-                content.innerHTML = `<div class="error">❌ Could not load file. Make sure the repository URL is correct and the file exists.</div>`;
+                content.innerHTML = `<div class="error">❌ Could not load file: ${err.message}</div>`;
             }
         }
 
