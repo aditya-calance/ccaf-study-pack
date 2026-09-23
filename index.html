@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CCAR-F Study Pack</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/DOMPurify/3.0.6/purify.min.js"></script>
     <script src="./markdown-data.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap">
     <style>
@@ -428,9 +427,7 @@
                 if (!markdown) throw new Error('File not found in embedded data');
 
                 const html = marked.parse(markdown);
-                const clean = DOMPurify.sanitize(html);
-
-                content.innerHTML = clean;
+                content.innerHTML = html;
 
                 // Update breadcrumb
                 const breadcrumb = document.getElementById('breadcrumb');
